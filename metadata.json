@@ -1,0 +1,6 @@
+{
+  "name": "Frontend Audit & Design Improver",
+  "description": "Kariba: Peer-to-peer neighborhood tool and gear library to borrow and share equipment locally.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
