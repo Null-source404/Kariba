@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Plus, Wrench, Sparkles, Image as ImageIcon, Check } from 'lucide-react';
+import { motion } from 'motion/react';
 import { User, GearCategory, Listing } from '../types/kariba';
 import { karibaService } from '../services/karibaStore';
 
@@ -69,9 +70,19 @@ export function CreateListingModal({ isOpen, onClose, currentUser, onListingCrea
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#25332c]/65 backdrop-blur-xs">
-      <div 
-        className="bg-white rounded-3xl max-w-xl w-full border border-[#ded9cf] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col"
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#25332c]/65 backdrop-blur-xs"
+    >
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{ type: 'spring', damping: 26, stiffness: 340 }}
+        className="bg-white rounded-3xl max-w-xl w-full border border-[#ded9cf] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         role="dialog"
         aria-labelledby="create-listing-title"
       >
@@ -252,7 +263,7 @@ export function CreateListingModal({ isOpen, onClose, currentUser, onListingCrea
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MapPin, Shield, Star, Clock, Check, Wrench } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Listing } from '../types/kariba';
 
 interface Props {
@@ -7,13 +8,26 @@ interface Props {
   onSelect: (listing: Listing) => void;
   onBorrow: (listing: Listing) => void;
   isOwner: boolean;
+  index?: number;
 }
 
-export function ListingCard({ listing, onSelect, onBorrow, isOwner }: Props) {
+export function ListingCard({ listing, onSelect, onBorrow, isOwner, index = 0 }: Props) {
   const [imageFailed, setImageFailed] = useState(false);
 
   return (
-    <div className="bg-white rounded-2xl border border-[#ded9cf] overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between group">
+    <motion.div 
+      layout
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ 
+        duration: 0.28, 
+        delay: Math.min(index * 0.04, 0.32),
+        ease: 'easeOut'
+      }}
+      whileHover={{ y: -5, transition: { duration: 0.18 } }}
+      className="bg-white rounded-2xl border border-[#ded9cf] overflow-hidden shadow-2xs hover:shadow-xl hover:shadow-[#25332c]/8 transition-shadow duration-200 flex flex-col justify-between group"
+    >
       <div>
         {/* Image Container with Fallback */}
         <div 
@@ -25,7 +39,7 @@ export function ListingCard({ listing, onSelect, onBorrow, isOwner }: Props) {
               src={listing.image_url}
               alt={listing.title}
               onError={() => setImageFailed(true)}
-              className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500 ease-out"
               loading="lazy"
             />
           ) : (
@@ -105,28 +119,30 @@ export function ListingCard({ listing, onSelect, onBorrow, isOwner }: Props) {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.95 }}
               onClick={() => onSelect(listing)}
               className="px-2.5 py-1.5 text-xs font-semibold text-[#25332c] hover:bg-[#f7f3eb] rounded-xl transition-colors border border-[#ded9cf]"
             >
               Details
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               type="button"
+              whileTap={{ scale: isOwner ? 1 : 0.95 }}
               disabled={isOwner}
               onClick={() => onBorrow(listing)}
-              className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all shadow-xs active:scale-[0.98] ${
+              className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all shadow-xs ${
                 isOwner
                   ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
                   : 'bg-[#d96f4b] hover:bg-[#c25e3c] text-white'
               }`}
             >
               {isOwner ? 'Your Gear' : 'Borrow'}
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

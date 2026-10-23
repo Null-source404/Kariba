@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Calendar, Clock, ShieldCheck, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Listing, User, BorrowRequest } from '../types/kariba';
 import { karibaService } from '../services/karibaStore';
 
@@ -57,9 +58,19 @@ export function BorrowModal({ listing, currentUser, onClose, onSuccess }: Props)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#25332c]/60 backdrop-blur-xs">
-      <div 
-        className="bg-white rounded-3xl max-w-lg w-full border border-[#ded9cf] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#25332c]/60 backdrop-blur-xs"
+    >
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{ type: 'spring', damping: 26, stiffness: 340 }}
+        className="bg-white rounded-3xl max-w-lg w-full border border-[#ded9cf] shadow-2xl overflow-hidden"
         role="dialog"
         aria-labelledby="borrow-modal-title"
       >
@@ -90,14 +101,14 @@ export function BorrowModal({ listing, currentUser, onClose, onSuccess }: Props)
 
         {/* Success View */}
         {submittedRequest ? (
-          <div className="p-8 text-center space-y-4">
-            <div className="w-14 h-14 rounded-full bg-[#71866f]/20 text-[#71866f] flex items-center justify-center mx-auto">
-              <CheckCircle2 size={32} />
+          <div className="p-8 text-center space-y-4 animate-in fade-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-md ring-8 ring-emerald-50 scale-100 transition-transform">
+              <CheckCircle2 size={36} className="animate-in zoom-in-50 duration-300" />
             </div>
-            <h3 className="font-serif-display text-xl font-bold text-[#25332c]">
+            <h3 className="font-serif-display text-2xl font-bold text-[#25332c]">
               Borrow Request Sent to {listing.owner_name}!
             </h3>
-            <p className="text-xs text-[#25332c]/70 max-w-sm mx-auto leading-relaxed">
+            <p className="text-xs text-[#25332c]/75 max-w-sm mx-auto leading-relaxed">
               We notified {listing.owner_name}. Once they approve, you'll receive the exact pickup address and contact details in your Borrowing dashboard.
             </p>
             <div className="p-4 rounded-xl bg-[#f7f3eb] border border-[#ded9cf] text-xs text-left space-y-1.5 font-mono">
@@ -220,7 +231,7 @@ export function BorrowModal({ listing, currentUser, onClose, onSuccess }: Props)
             </div>
           </form>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

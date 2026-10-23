@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Sliders, MapPin, Sparkles, Compass, ShieldCheck } from 'lucide-react';
+import { motion } from 'motion/react';
 import { GearCategory } from '../types/kariba';
 
 interface Props {
@@ -100,20 +101,31 @@ export function HeroBanner({
 
           {/* Quick Category Segmented Buttons */}
           <div className="flex items-center justify-center gap-1.5 flex-wrap pt-2">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                  selectedCategory === cat.id
-                    ? 'bg-[#25332c] text-white shadow-xs font-semibold'
-                    : 'bg-white/80 hover:bg-white text-[#25332c] border border-[#ded9cf]'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+            {categories.map((cat) => {
+              const isSelected = selectedCategory === cat.id;
+              return (
+                <motion.button
+                  key={cat.id}
+                  type="button"
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`relative px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors z-10 ${
+                    isSelected
+                      ? 'text-white font-semibold'
+                      : 'text-[#25332c] hover:bg-white/80 bg-white/60 border border-[#ded9cf]'
+                  }`}
+                >
+                  {isSelected && (
+                    <motion.div
+                      layoutId="activeCategoryPill"
+                      className="absolute inset-0 bg-[#25332c] rounded-xl -z-10 shadow-xs"
+                      transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                    />
+                  )}
+                  <span>{cat.label}</span>
+                </motion.button>
+              );
+            })}
           </div>
 
           <div className="text-[11px] text-[#71866f] flex items-center justify-center gap-3 pt-1">

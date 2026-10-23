@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { KaribaHeader } from './components/KaribaHeader';
 import { HeroBanner } from './components/HeroBanner';
 import { ListingCard } from './components/ListingCard';
@@ -7,6 +8,9 @@ import { ListingDetailModal } from './components/ListingDetailModal';
 import { DashboardModal } from './components/DashboardModal';
 import { CreateListingModal } from './components/CreateListingModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
+import { ShedRadarView } from './components/ShedRadarView';
+import { ProjectBundleCalculator } from './components/ProjectBundleCalculator';
+import { SecurityInspectorModal } from './components/SecurityInspectorModal';
 import { 
   karibaService, 
   CURRENT_NEIGHBORHOOD_LOCATION, 
@@ -22,7 +26,10 @@ import {
   Leaf, 
   DollarSign, 
   ArrowRight,
-  Plus
+  Plus,
+  Compass,
+  Layers,
+  LayoutGrid
 } from 'lucide-react';
 
 export default function App() {
@@ -31,6 +38,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<GearCategory>('all');
   const [radiusMiles, setRadiusMiles] = useState<number>(3.0);
   const [dataVersion, setDataVersion] = useState<number>(0);
+  const [activeViewMode, setActiveViewMode] = useState<'catalog' | 'radar' | 'bundles'>('catalog');
 
   // Modals state
   const [selectedListingDetail, setSelectedListingDetail] = useState<Listing | null>(null);
@@ -39,13 +47,13 @@ export default function App() {
   const [dashboardTab, setDashboardTab] = useState<'incoming' | 'borrowing' | 'myGear' | 'impact'>('incoming');
   const [isCreateListingOpen, setIsCreateListingOpen] = useState<boolean>(false);
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState<boolean>(false);
+  const [isSecurityInspectorOpen, setIsSecurityInspectorOpen] = useState<boolean>(false);
 
   // Trigger re-render when data updates
   const refreshData = () => setDataVersion(v => v + 1);
 
   // Filtered listings using exact Haversine formula from services
   const nearbyListings = useMemo(() => {
-    // depend on dataVersion
     void dataVersion;
     return karibaService.getNearbyListings(
       CURRENT_NEIGHBORHOOD_LOCATION.lat,
@@ -99,6 +107,7 @@ export default function App() {
         onOpenDashboard={handleOpenDashboard}
         onOpenCreateListing={() => setIsCreateListingOpen(true)}
         onOpenHowItWorks={() => setIsHowItWorksOpen(true)}
+        onOpenSecurityInspector={() => setIsSecurityInspectorOpen(true)}
         incomingPendingCount={incomingPendingCount}
         activeBorrowsCount={activeBorrowsCount}
       />
@@ -116,19 +125,76 @@ export default function App() {
           totalListingsCount={nearbyListings.length}
         />
 
-        {/* Listings Section */}
-        <section id="browse" className="pt-10 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-serif-display text-2xl font-bold text-[#25332c]">
-                Available Near You
-              </h2>
-              <p className="text-xs text-[#71866f] mt-0.5">
-                Showing gear within {radiusMiles} miles of {CURRENT_NEIGHBORHOOD_LOCATION.name}
-              </p>
+        {/* Interactive View Switcher Bar */}
+        <section id="browse" className="pt-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/70 p-3 px-5 rounded-2xl border border-[#ded9cf]">
+            {/* View Mode Segmented Control */}
+            <div className="flex items-center gap-1.5 p-1 bg-[#f7f3eb] rounded-xl border border-[#ded9cf] text-xs font-semibold relative">
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.96 }}
+                onClick={() => setActiveViewMode('catalog')}
+                className={`relative px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 z-10 ${
+                  activeViewMode === 'catalog'
+                    ? 'text-white font-bold'
+                    : 'text-[#25332c]/70 hover:text-[#25332c]'
+                }`}
+              >
+                {activeViewMode === 'catalog' && (
+                  <motion.div
+                    layoutId="activeViewTab"
+                    className="absolute inset-0 bg-[#25332c] rounded-lg -z-10 shadow-xs"
+                    transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                  />
+                )}
+                <LayoutGrid size={15} />
+                <span>Tool Catalog (12)</span>
+              </motion.button>
+
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.96 }}
+                onClick={() => setActiveViewMode('radar')}
+                className={`relative px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 z-10 ${
+                  activeViewMode === 'radar'
+                    ? 'text-white font-bold'
+                    : 'text-[#25332c]/70 hover:text-[#25332c]'
+                }`}
+              >
+                {activeViewMode === 'radar' && (
+                  <motion.div
+                    layoutId="activeViewTab"
+                    className="absolute inset-0 bg-[#25332c] rounded-lg -z-10 shadow-xs"
+                    transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                  />
+                )}
+                <Compass size={15} />
+                <span>Neighborhood Radar</span>
+              </motion.button>
+
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.96 }}
+                onClick={() => setActiveViewMode('bundles')}
+                className={`relative px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 z-10 ${
+                  activeViewMode === 'bundles'
+                    ? 'text-white font-bold'
+                    : 'text-[#25332c]/70 hover:text-[#25332c]'
+                }`}
+              >
+                {activeViewMode === 'bundles' && (
+                  <motion.div
+                    layoutId="activeViewTab"
+                    className="absolute inset-0 bg-[#25332c] rounded-lg -z-10 shadow-xs"
+                    transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                  />
+                )}
+                <Sparkles size={15} className="text-[#d96f4b]" />
+                <span>Weekend Kits (Save 90%+)</span>
+              </motion.button>
             </div>
 
-            {/* Quick Filter Pill Tag */}
+            {/* Quick Active Persona Indicator */}
             <div className="flex items-center gap-2 text-xs text-[#71866f]">
               <span>Viewing as:</span>
               <span className="font-bold text-[#25332c] bg-white px-2.5 py-1 rounded-lg border border-[#ded9cf]">
@@ -137,52 +203,104 @@ export default function App() {
             </div>
           </div>
 
-          {/* Grid of Listings */}
-          {nearbyListings.length === 0 ? (
-            <div className="p-16 text-center rounded-3xl border border-dashed border-[#ded9cf] bg-white/50 space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#71866f]/15 text-[#71866f] flex items-center justify-center mx-auto">
-                <Sliders size={24} />
-              </div>
-              <h3 className="font-serif-display text-lg font-bold text-[#25332c]">
-                No gear found in this radius
-              </h3>
-              <p className="text-xs text-[#71866f] max-w-md mx-auto">
-                Try widening your search radius slider above (e.g. up to 10 miles), clearing your search text, or list your own equipment for your neighbors!
-              </p>
-              <div className="pt-2 flex justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('all');
-                    setRadiusMiles(10);
-                  }}
-                  className="px-4 py-2 text-xs font-semibold text-[#25332c] bg-white border border-[#ded9cf] hover:bg-[#f7f3eb] rounded-xl transition-colors"
-                >
-                  Expand Radius to 10 Miles
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsCreateListingOpen(true)}
-                  className="px-4 py-2 text-xs font-bold text-white bg-[#25332c] hover:bg-[#1a241f] rounded-xl transition-colors"
-                >
-                  + List an Item Now
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {nearbyListings.map((item) => (
-                <ListingCard
-                  key={item.id}
-                  listing={item}
-                  onSelect={(l) => setSelectedListingDetail(l)}
-                  onBorrow={(l) => setBorrowListing(l)}
-                  isOwner={item.owner_id === currentUser.id}
+          {/* VIEW SWITCHER ANIMATED TRANSITIONS */}
+          <AnimatePresence mode="wait">
+            {/* VIEW 1: RADAR VIEW */}
+            {activeViewMode === 'radar' && (
+              <motion.div
+                key="radar"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+              >
+                <ShedRadarView
+                  listings={nearbyListings}
+                  onSelectListing={(l) => setSelectedListingDetail(l)}
+                  onBorrowListing={(l) => setBorrowListing(l)}
+                  radiusMiles={radiusMiles}
                 />
-              ))}
-            </div>
-          )}
+              </motion.div>
+            )}
+
+            {/* VIEW 2: BUNDLES CALCULATOR */}
+            {activeViewMode === 'bundles' && (
+              <motion.div
+                key="bundles"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+              >
+                <ProjectBundleCalculator
+                  listings={karibaService.getListings()}
+                  onSelectListing={(l) => setSelectedListingDetail(l)}
+                  onBorrowListing={(l) => setBorrowListing(l)}
+                />
+              </motion.div>
+            )}
+
+            {/* VIEW 3: STANDARD GRID CATALOG */}
+            {activeViewMode === 'catalog' && (
+              <motion.div
+                key="catalog"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+              >
+                {nearbyListings.length === 0 ? (
+                  <div className="p-16 text-center rounded-3xl border border-dashed border-[#ded9cf] bg-white/50 space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-[#71866f]/15 text-[#71866f] flex items-center justify-center mx-auto">
+                      <Sliders size={24} />
+                    </div>
+                    <h3 className="font-serif-display text-lg font-bold text-[#25332c]">
+                      No gear found in this radius
+                    </h3>
+                    <p className="text-xs text-[#71866f] max-w-md mx-auto">
+                      Try widening your search radius slider above (e.g. up to 10 miles), clearing your search text, or list your own equipment for your neighbors!
+                    </p>
+                    <div className="pt-2 flex justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery('');
+                          setSelectedCategory('all');
+                          setRadiusMiles(10);
+                        }}
+                        className="px-4 py-2 text-xs font-semibold text-[#25332c] bg-white border border-[#ded9cf] hover:bg-[#f7f3eb] rounded-xl transition-colors"
+                      >
+                        Expand Radius to 10 Miles
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsCreateListingOpen(true)}
+                        className="px-4 py-2 text-xs font-bold text-white bg-[#25332c] hover:bg-[#1a241f] rounded-xl transition-colors"
+                      >
+                        + List an Item Now
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <motion.div 
+                    layout
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                  >
+                    {nearbyListings.map((item, index) => (
+                      <ListingCard
+                        key={item.id}
+                        listing={item}
+                        index={index}
+                        onSelect={(l) => setSelectedListingDetail(l)}
+                        onBorrow={(l) => setBorrowListing(l)}
+                        isOwner={item.owner_id === currentUser.id}
+                      />
+                    ))}
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
 
         {/* Community Proof & Why It Matters Strip */}
@@ -266,6 +384,14 @@ export default function App() {
           <div className="flex items-center gap-6">
             <button
               type="button"
+              onClick={() => setIsSecurityInspectorOpen(true)}
+              className="hover:text-[#25332c] transition-colors flex items-center gap-1 font-semibold text-emerald-800"
+            >
+              <ShieldCheck size={14} />
+              <span>Backend Security Shield</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setIsHowItWorksOpen(true)}
               className="hover:text-[#25332c] transition-colors"
             >
@@ -292,50 +418,80 @@ export default function App() {
         </div>
       </footer>
 
-      {/* MODALS */}
+      {/* MODALS WITH SPRING OPEN & EXIT ANIMATIONS */}
       {/* 1. Item Detail Modal */}
-      <ListingDetailModal
-        listing={selectedListingDetail}
-        currentUser={currentUser}
-        onClose={() => setSelectedListingDetail(null)}
-        onOpenBorrow={(l) => setBorrowListing(l)}
-      />
+      <AnimatePresence>
+        {selectedListingDetail && (
+          <ListingDetailModal
+            listing={selectedListingDetail}
+            currentUser={currentUser}
+            onClose={() => setSelectedListingDetail(null)}
+            onOpenBorrow={(l) => setBorrowListing(l)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* 2. Borrow Reservation Modal */}
-      <BorrowModal
-        listing={borrowListing}
-        currentUser={currentUser}
-        onClose={() => setBorrowListing(null)}
-        onSuccess={handleBorrowRequestSuccess}
-      />
+      <AnimatePresence>
+        {borrowListing && (
+          <BorrowModal
+            listing={borrowListing}
+            currentUser={currentUser}
+            onClose={() => setBorrowListing(null)}
+            onSuccess={handleBorrowRequestSuccess}
+          />
+        )}
+      </AnimatePresence>
 
       {/* 3. Dashboard Modal (Lender & Borrower) */}
-      <DashboardModal
-        isOpen={isDashboardOpen}
-        onClose={() => setIsDashboardOpen(false)}
-        currentUser={currentUser}
-        initialTab={dashboardTab}
-        onRefreshData={refreshData}
-      />
+      <AnimatePresence>
+        {isDashboardOpen && (
+          <DashboardModal
+            isOpen={isDashboardOpen}
+            onClose={() => setIsDashboardOpen(false)}
+            currentUser={currentUser}
+            initialTab={dashboardTab}
+            onRefreshData={refreshData}
+          />
+        )}
+      </AnimatePresence>
 
       {/* 4. Create Listing Modal */}
-      <CreateListingModal
-        isOpen={isCreateListingOpen}
-        onClose={() => setIsCreateListingOpen(false)}
-        currentUser={currentUser}
-        onListingCreated={handleListingCreated}
-      />
+      <AnimatePresence>
+        {isCreateListingOpen && (
+          <CreateListingModal
+            isOpen={isCreateListingOpen}
+            onClose={() => setIsCreateListingOpen(false)}
+            currentUser={currentUser}
+            onListingCreated={handleListingCreated}
+          />
+        )}
+      </AnimatePresence>
 
       {/* 5. How It Works Guide Modal */}
-      <HowItWorksModal
-        isOpen={isHowItWorksOpen}
-        onClose={() => setIsHowItWorksOpen(false)}
-        onOpenExplore={() => {
-          setIsHowItWorksOpen(false);
-          const el = document.getElementById('browse');
-          el?.scrollIntoView({ behavior: 'smooth' });
-        }}
-      />
+      <AnimatePresence>
+        {isHowItWorksOpen && (
+          <HowItWorksModal
+            isOpen={isHowItWorksOpen}
+            onClose={() => setIsHowItWorksOpen(false)}
+            onOpenExplore={() => {
+              setIsHowItWorksOpen(false);
+              const el = document.getElementById('browse');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* 6. Security & Backend Defense Inspector */}
+      <AnimatePresence>
+        {isSecurityInspectorOpen && (
+          <SecurityInspectorModal
+            isOpen={isSecurityInspectorOpen}
+            onClose={() => setIsSecurityInspectorOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { User, BorrowRequest, Listing, BorrowStatus } from '../types/kariba';
 import { karibaService } from '../services/karibaStore';
 
@@ -88,9 +89,19 @@ export function DashboardModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#25332c]/65 backdrop-blur-xs">
-      <div 
-        className="bg-white rounded-3xl max-w-3xl w-full border border-[#ded9cf] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col"
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#25332c]/65 backdrop-blur-xs"
+    >
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{ type: 'spring', damping: 26, stiffness: 340 }}
+        className="bg-white rounded-3xl max-w-3xl w-full border border-[#ded9cf] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         role="dialog"
         aria-labelledby="dashboard-title"
       >
@@ -115,16 +126,23 @@ export function DashboardModal({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 p-2 px-6 border-b border-[#ded9cf] bg-white shrink-0 overflow-x-auto text-xs font-semibold">
+        <div className="flex items-center gap-2 p-2 px-6 border-b border-[#ded9cf] bg-white shrink-0 overflow-x-auto text-xs font-semibold relative">
           <button
             type="button"
             onClick={() => setActiveTab('incoming')}
-            className={`px-3 py-1.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            className={`relative px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 z-10 ${
               activeTab === 'incoming'
-                ? 'bg-[#25332c] text-white'
-                : 'text-[#25332c]/70 hover:bg-[#f7f3eb]'
+                ? 'text-white'
+                : 'text-[#25332c]/70 hover:text-[#25332c]'
             }`}
           >
+            {activeTab === 'incoming' && (
+              <motion.div
+                layoutId="activeDashboardTab"
+                className="absolute inset-0 bg-[#25332c] rounded-xl -z-10 shadow-xs"
+                transition={{ type: 'spring', damping: 24, stiffness: 300 }}
+              />
+            )}
             <Inbox size={14} />
             <span>Lender Inbox</span>
             {incomingRequests.filter(r => r.status === 'pending').length > 0 && (
@@ -137,12 +155,19 @@ export function DashboardModal({
           <button
             type="button"
             onClick={() => setActiveTab('borrowing')}
-            className={`px-3 py-1.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            className={`relative px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 z-10 ${
               activeTab === 'borrowing'
-                ? 'bg-[#25332c] text-white'
-                : 'text-[#25332c]/70 hover:bg-[#f7f3eb]'
+                ? 'text-white'
+                : 'text-[#25332c]/70 hover:text-[#25332c]'
             }`}
           >
+            {activeTab === 'borrowing' && (
+              <motion.div
+                layoutId="activeDashboardTab"
+                className="absolute inset-0 bg-[#25332c] rounded-xl -z-10 shadow-xs"
+                transition={{ type: 'spring', damping: 24, stiffness: 300 }}
+              />
+            )}
             <Calendar size={14} />
             <span>My Borrowing ({myBorrows.length})</span>
           </button>
@@ -150,12 +175,19 @@ export function DashboardModal({
           <button
             type="button"
             onClick={() => setActiveTab('myGear')}
-            className={`px-3 py-1.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            className={`relative px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 z-10 ${
               activeTab === 'myGear'
-                ? 'bg-[#25332c] text-white'
-                : 'text-[#25332c]/70 hover:bg-[#f7f3eb]'
+                ? 'text-white'
+                : 'text-[#25332c]/70 hover:text-[#25332c]'
             }`}
           >
+            {activeTab === 'myGear' && (
+              <motion.div
+                layoutId="activeDashboardTab"
+                className="absolute inset-0 bg-[#25332c] rounded-xl -z-10 shadow-xs"
+                transition={{ type: 'spring', damping: 24, stiffness: 300 }}
+              />
+            )}
             <Package size={14} />
             <span>My Listed Gear ({myListings.length})</span>
           </button>
@@ -163,13 +195,20 @@ export function DashboardModal({
           <button
             type="button"
             onClick={() => setActiveTab('impact')}
-            className={`px-3 py-1.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            className={`relative px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap flex items-center gap-1.5 z-10 ${
               activeTab === 'impact'
-                ? 'bg-[#25332c] text-white'
-                : 'text-[#25332c]/70 hover:bg-[#f7f3eb]'
+                ? 'text-white'
+                : 'text-[#25332c]/70 hover:text-[#25332c]'
             }`}
           >
-            <Sparkles size={14} className="text-[#f0c96b]" />
+            {activeTab === 'impact' && (
+              <motion.div
+                layoutId="activeDashboardTab"
+                className="absolute inset-0 bg-[#25332c] rounded-xl -z-10 shadow-xs"
+                transition={{ type: 'spring', damping: 24, stiffness: 300 }}
+              />
+            )}
+            <Sparkles size={14} className={activeTab === 'impact' ? 'text-[#f0c96b]' : 'text-[#71866f]'} />
             <span>Community Impact</span>
           </button>
         </div>
@@ -446,7 +485,7 @@ export function DashboardModal({
             Close Dashboard
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

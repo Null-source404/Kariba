@@ -1,5 +1,6 @@
 import React from 'react';
-import { Wrench, Plus, UserCheck, Inbox, Sparkles, ChevronDown } from 'lucide-react';
+import { Wrench, Plus, UserCheck, Inbox, Sparkles, ChevronDown, ShieldCheck } from 'lucide-react';
+import { motion } from 'motion/react';
 import { User } from '../types/kariba';
 import { PRESET_USERS } from '../services/karibaStore';
 
@@ -9,6 +10,7 @@ interface Props {
   onOpenDashboard: (initialTab?: 'incoming' | 'borrowing') => void;
   onOpenCreateListing: () => void;
   onOpenHowItWorks: () => void;
+  onOpenSecurityInspector: () => void;
   incomingPendingCount: number;
   activeBorrowsCount: number;
 }
@@ -19,6 +21,7 @@ export function KaribaHeader({
   onOpenDashboard,
   onOpenCreateListing,
   onOpenHowItWorks,
+  onOpenSecurityInspector,
   incomingPendingCount,
   activeBorrowsCount,
 }: Props) {
@@ -86,6 +89,14 @@ export function KaribaHeader({
                 </span>
               )}
             </button>
+            <button
+              type="button"
+              onClick={onOpenSecurityInspector}
+              className="text-[#71866f] hover:text-[#25332c] transition-colors whitespace-nowrap shrink-0 flex items-center gap-1 bg-[#71866f]/10 px-2.5 py-1 rounded-lg"
+            >
+              <ShieldCheck size={14} className="text-emerald-700" />
+              <span>Security Shield</span>
+            </button>
           </nav>
 
           {/* Zone 3: User Switcher & Primary Action */}
@@ -139,14 +150,16 @@ export function KaribaHeader({
             </div>
 
             {/* List an item button */}
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
               onClick={onOpenCreateListing}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-[#25332c] hover:bg-[#1a241f] rounded-xl transition-all shadow-xs active:scale-[0.98] whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-[#25332c] hover:bg-[#1a241f] rounded-xl transition-all shadow-xs whitespace-nowrap"
             >
               <Plus size={15} className="text-[#f0c96b]" />
               <span>List Gear</span>
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
